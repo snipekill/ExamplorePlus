@@ -10,16 +10,15 @@ Meteor.startup(() => {
   //mongoimport --db test --collection <collectionName> --drop --file ~/downloads/<data_dump>.json
   console.log('start-up code running');
 
-  //var reload = true;  
-  var reload = true;
+  // var reload = true;  
+  var reload = false;
 
   if (reload){
     // console.log('reload',reload);
-    Assets.getText('findViewById.json', function(err, data) {
+    Assets.getText('charAt.json', function(err, data) {
       var content = EJSON.parse(data);
-      console.log('content',content);
-      _.each(content, function(doc){
-
+      // console.log('content',content);
+      content.forEach(doc => {
         doc['codeLength'] = doc['rawCode'].length;
         if (doc['hasTryCatch']===1){
           doc['try'] = 'try {';
@@ -31,22 +30,23 @@ Meteor.startup(() => {
         } else {
           doc['finally'] = 'empty';
         }
-
+  
         if ((doc['guardType']==='IF {') || (doc['guardType']==='IF')){
           doc['guardType'] = 'if ... {';
         } else if ((doc['guardType']==='LOOP {') || (doc['guardType']==='LOOP')){
           doc['guardType'] = 'for/while ... {';
         }
-
+  
         if ((doc['checkType']==='IF') || (doc['checkType']==='IF {')){
           doc['checkType'] = 'if ... {';
         } else if ((doc['checkType']==='LOOP') || (doc['checkType']==='LOOP {')){
           doc['checkType'] = 'for/while ... {';
         }
-
+  
         Examples.insert(doc);
-
+        
       });
+
       console.log('how many examples now?',Examples.find().count());
     }); 
   }
